@@ -1,0 +1,14 @@
+body {
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+.container {
+    margin-top: 50px;
+}
+.hidden {
+    display: none;
+}
+video {
+    width: 300px;
+    border: 2px solid black;
+}
